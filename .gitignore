@@ -32,4 +32,8 @@ out/
 .vscode/
 
 ### SpringRestDocs Document ###
+**/gradle.properties
+**/logs/
+!config/README.md
+logs
 **/static/docs/
