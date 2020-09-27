@@ -6,6 +6,8 @@ import com.salt.sample.restdocs.dto.member.request.MemberBody
 import com.salt.sample.restdocs.service.MemberService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder
+import javax.validation.Valid
 
 @RestController
 @RequestMapping("/member")
@@ -14,13 +16,18 @@ class MemberController(
 ) {
 
     @PostMapping
-    fun createMember(@RequestBody memberBody: MemberBody): ResponseEntity<ApiResponse<Long>> {
+    fun createMember(@Valid @RequestBody memberBody: MemberBody): ResponseEntity<ApiResponse<Member>> {
         val response = ApiResponse.success(memberService.create(memberBody))
-        return ResponseEntity.ok().body(response)
+        val location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(response.data?.id)
+                .toUri()
+
+        return ResponseEntity.created(location).body(response)
     }
 
     @GetMapping("/{memberId}")
-    fun retrievalMember(@PathVariable memberId: Long): ResponseEntity<ApiResponse<Member>> {
+    fun retrievalMember(@PathVariable memberId: Long): ResponseEntity<ApiResponse<List<Member>>> {
         val response = ApiResponse.success(memberService.retrieval(memberId))
         return ResponseEntity.ok().body(response)
     }

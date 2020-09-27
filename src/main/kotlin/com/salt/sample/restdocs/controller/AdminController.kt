@@ -6,6 +6,7 @@ import com.salt.sample.restdocs.dto.member.request.MemberBody
 import com.salt.sample.restdocs.service.MemberService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 
 @RestController
 @RequestMapping("/admin")
@@ -14,13 +15,18 @@ class AdminController(
 ) {
 
     @PostMapping
-    fun createMember(@RequestBody adminBody: MemberBody): ResponseEntity<ApiResponse<Long>> {
+    fun createMember(@RequestBody adminBody: MemberBody): ResponseEntity<ApiResponse<Member>> {
         val response = ApiResponse.success(memberService.create(adminBody))
-        return ResponseEntity.ok().body(response)
+        val location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(response.data?.id)
+                .toUri()
+
+        return ResponseEntity.created(location).body(response)
     }
 
     @GetMapping("/{adminId}")
-    fun retrievalMember(@PathVariable adminId: Long): ResponseEntity<ApiResponse<Member>> {
+    fun retrievalMember(@PathVariable adminId: Long): ResponseEntity<ApiResponse<List<Member>>> {
         val response = ApiResponse.success(memberService.retrieval(adminId))
         return ResponseEntity.ok().body(response)
     }
